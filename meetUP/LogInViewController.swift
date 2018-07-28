@@ -20,6 +20,9 @@ class LogInViewController: UIViewController {
     let textField1 = SkyFloatingLabelTextField(frame: CGRect(x: 70, y: 200, width: 250, height: 45))
     let textField2 = SkyFloatingLabelTextField(frame: CGRect(x: 70, y: 300, width: 250, height: 45))
     @IBOutlet weak var logInButton: UIButton!
+    var accountResponses: [String: String] = [:]
+    var accountNames: [String : String] = [:]
+    var accountImages: [String: Data] = [:]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,10 +60,33 @@ class LogInViewController: UIViewController {
                 print("Log in was successful.")
                 SVProgressHUD.dismiss()
                 let userID = Auth.auth().currentUser!.uid
-                self.performSegue(withIdentifier: "go\(accountResponses["\(userID)"]!)", sender: self)
+                self.performSegue(withIdentifier: "go\(self.accountResponses["\(userID)"]!)", sender: self)
             }
         })
         
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "goLibertarian" {
+            let destinationVC = segue.destination as! LibertarianChatViewController
+            destinationVC.accountNames = accountNames
+            destinationVC.accountImages = accountImages
+        }
+        else if segue.identifier == "goGreen" {
+            let destinationVC = segue.destination as! GreenChatViewController
+            destinationVC.accountNames = accountNames
+            destinationVC.accountImages = accountImages
+        }
+        else if segue.identifier == "goRepublican" {
+            let destinationVC = segue.destination as! RepublicanChatViewController
+            destinationVC.accountNames = accountNames
+            destinationVC.accountImages = accountImages
+        }
+        else if segue.identifier == "goDemocratic" {
+            let destinationVC = segue.destination as! DemocratChatViewController
+            destinationVC.accountNames = accountNames
+            destinationVC.accountImages = accountImages
+        }
     }
     
     @objc func dismissKeyboard() {

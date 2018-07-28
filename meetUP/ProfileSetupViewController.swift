@@ -11,10 +11,7 @@ import SkyFloatingLabelTextField
 import Firebase
 import SVProgressHUD
 
-var accountNames : [String : String] = [:]
-var accountImages : [String : UIImage] = [:]
-
-class ProfileSetupViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class ProfileSetupViewController: UIViewController {
 
 
     let lightGreyColor = UIColor(red: 197/255, green: 205/255, blue: 205/255, alpha: 1.0)
@@ -24,9 +21,23 @@ class ProfileSetupViewController: UIViewController, UIImagePickerControllerDeleg
     let userID = Auth.auth().currentUser!.uid
     let userEmail = Auth.auth().currentUser!.email
     let imagePicker = UIImagePickerController()
+    let userDefaults = UserDefaults.standard
     
     @IBOutlet weak var profileImage: UIImageView!
     @IBOutlet weak var doneButton: UIButton!
+    var response : String = ""
+    var accountResponses: [String: String] = [:]
+    var accountNames: [String : String] = [:]
+    var accountImages: [String : Data] = [:]
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if let theAccountNames = userDefaults.value(forKey: "accountNames") {
+            accountNames = theAccountNames as! [String : String]
+        }
+        if let theAccountImages = userDefaults.value(forKey: "accountImages") {
+            accountImages = theAccountImages as! [String : Data]
+        }
+    }
     
     
     override func viewDidLoad() {
@@ -56,14 +67,18 @@ class ProfileSetupViewController: UIViewController, UIImagePickerControllerDeleg
     @IBAction func pressedDone(_ sender: Any) {
         
         accountNames["\(userEmail!)"] = textField1.text
-        accountImages["\(userEmail!)"] = profileImage.image
+        let image = profileImage.image
+        let imageData = UIImageJPEGRepresentation(image!, 0.01) as NSData?
+        accountImages["\(userEmail!)"] = imageData as! Data
         
-        guard (navigationController?.popToRootViewController(animated: true)) != nil
-                else {
-                    print("No view controllers to be popped off.")
-                    return
-        }
-        
+        let rootVC = navigationController?.viewControllers.first as? WelcomeViewController
+        rootVC?.accountImages = accountImages
+        rootVC?.accountNames = accountNames
+        rootVC?.accountResponses = accountResponses
+        rootVC?.response = response
+        navigationController?.popToRootViewController(animated: true)
+        userDefaults.set(accountNames, forKey: "accountNames")
+        userDefaults.set(accountImages, forKey: "accountImages")
     }
     
     @IBAction func cameraButtonPressed(_ sender: Any) {
@@ -83,6 +98,13 @@ class ProfileSetupViewController: UIViewController, UIImagePickerControllerDeleg
         self.present(self.imagePicker, animated: true, completion: nil)
     }
     
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+
+}
+
+extension ProfileSetupViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
             profileImage.image = image
@@ -90,9 +112,4 @@ class ProfileSetupViewController: UIViewController, UIImagePickerControllerDeleg
         }
         SVProgressHUD.dismiss()
     }
-    
-    @objc func dismissKeyboard() {
-        view.endEditing(true)
-    }
-
 }

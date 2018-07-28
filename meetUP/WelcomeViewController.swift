@@ -11,6 +11,10 @@ class WelcomeViewController: UIViewController {
 
     @IBOutlet weak var registerButton: UIButton!
     @IBOutlet weak var logInButton: UIButton!
+    var response: String = ""
+    var accountResponses: [String : String] = [:]
+    var accountNames: [String : String] = [:]
+    var accountImages: [String : Data] = [:]
     
     
     override func viewDidLoad() {
@@ -42,6 +46,15 @@ class WelcomeViewController: UIViewController {
         
         performSegue(withIdentifier: "logInUser", sender: self)
         
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "logInUser" {
+            let destinationVC = segue.destination as! LogInViewController
+            destinationVC.accountResponses = accountResponses
+            destinationVC.accountNames = accountNames
+            destinationVC.accountImages = accountImages
+        }
     }
     
 

@@ -8,8 +8,6 @@
 
 import UIKit
 import Firebase
-var response : String?
-var accountResponses: [String: String] = [:]
 
 class QuestionnaireViewController: UIViewController {
 
@@ -19,6 +17,10 @@ class QuestionnaireViewController: UIViewController {
     @IBOutlet weak var button3: UIButton!
     @IBOutlet weak var button4: UIButton!
     let userID = Auth.auth().currentUser!.uid
+    var response: String = ""
+    var accountResponses: [String: String] = [:]
+    let userDefaults = UserDefaults.standard
+    
     
     
     override func viewDidLoad() {
@@ -60,8 +62,9 @@ class QuestionnaireViewController: UIViewController {
         button3.layer.backgroundColor = UIColor.white.cgColor
         button4.layer.backgroundColor = UIColor.white.cgColor
         sender.layer.backgroundColor = UIColor.green.cgColor
-        response = sender.titleLabel?.text
+        response = (sender.titleLabel?.text)!
         accountResponses["\(userID)"] = response
+        userDefaults.set(accountResponses, forKey: "accountResponses")
         
     }
     
@@ -70,10 +73,21 @@ class QuestionnaireViewController: UIViewController {
         
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "setProfile" {
+            let destinationVC = segue.destination as! ProfileSetupViewController
+            destinationVC.response = response
+            destinationVC.accountResponses = accountResponses
+        }
+    }
+    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationItem.hidesBackButton = true
+        if let theAccountResponses = userDefaults.value(forKey: "accountResponses") {
+            accountResponses = theAccountResponses as! [String : String]
+        }
     }
     
 }
