@@ -31,6 +31,7 @@ class ProfileSetupViewController: UIViewController {
     var accountImages: [String : Data] = [:]
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
         if let theAccountNames = userDefaults.value(forKey: "accountNames") {
             accountNames = theAccountNames as! [String : String]
         }

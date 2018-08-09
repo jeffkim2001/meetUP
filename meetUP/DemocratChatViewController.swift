@@ -108,7 +108,7 @@ class DemocratChatViewController: UIViewController {
         }
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+        super.viewWillAppear(true)
         self.navigationItem.hidesBackButton = true
     }
         
